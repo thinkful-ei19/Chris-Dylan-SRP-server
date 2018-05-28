@@ -19,6 +19,8 @@ const app = express();
 
 const usersRouter = require('./routes/users.route')
 const authRouter = require('./routes/auth')
+const decksRouter = require('./routes/decks.route')
+const questionsRouter = require('./routes/questions.route')
 
 app.use(
   morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
@@ -41,6 +43,9 @@ app.use('/api', authRouter);
 
 passport.use(localStrategy);
 passport.use(jwtStrategy);
+
+app.use('/api', decksRouter);
+app.use('/api', questionsRouter);
 
 app.use(passport.authenticate('jwt', {session: false, failWithError: true}));
 

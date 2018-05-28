@@ -3,12 +3,11 @@
 const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
-  question: { type: String },
-  answer: { type: String },  
-  deckId: { type: mongoose.Schema.Types.ObjectId, ref: 'Deck', required: true }
+  question: { type: String, required: true },
+  answer: { type: String, required: true },  
+  next: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' },
+  previous: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' }
 });
-
-questionSchema.index({ name: 1, userId: 1 }, {unique: true});
 
 questionSchema.set('toObject', {
   transform: function (doc, ret) {

@@ -4,11 +4,8 @@ const mongoose = require('mongoose');
 
 const deckSchema = new mongoose.Schema({
   name: { type: String },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-//   questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }]
+  head: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', default: null}
 });
-
-deckSchema.index({ name: 1, userId: 1 }, {unique: true});
 
 deckSchema.set('toObject', {
   transform: function (doc, ret) {
