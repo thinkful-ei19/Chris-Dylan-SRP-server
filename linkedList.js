@@ -1,5 +1,5 @@
 class _Node {
-    constructor(value, next) {
+    constructor(value, next = null) {
         this.value = value;
         this.next = next;
     }
@@ -148,4 +148,31 @@ class LinkedList {
             }
         }
     }
+
+    insertBeforeMV(reinsert, number) {
+        let insert = reinsert;
+        
+        if (!this.head) {
+            return null;
+        }
+        if (number === 0) {
+            this.insertFirst(newItem)
+            return
+        } else {
+            let currNode = this.head;
+            let previousNode = this.head;
+            while ((currNode !== null)) {
+                previousNode = currNode; //count -1
+                currNode = currNode.next; //count -0
+                if (currNode.value.memoryValue === number+1) {
+                    previousNode.next = new _Node(insert, currNode)
+                } else if (currNode === null) {
+                    console.log('Count has exceeded the amount of items, unable to insert.')
+                    return;
+                }
+            }
+        }
+    }
 }
+
+module.exports = LinkedList;

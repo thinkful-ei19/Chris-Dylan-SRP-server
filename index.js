@@ -17,10 +17,11 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 
-const usersRouter = require('./routes/users.route')
-const authRouter = require('./routes/auth')
-const decksRouter = require('./routes/decks.route')
-const questionsRouter = require('./routes/questions.route')
+const usersRouter = require('./routes/users.route');
+const authRouter = require('./routes/auth');
+const decksRouter = require('./routes/decks.route');
+const questionsRouter = require('./routes/questions.route');
+const sessionsRouter = require('./routes/sessions');
 
 app.use(
   morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
@@ -46,6 +47,7 @@ passport.use(jwtStrategy);
 
 app.use('/api', decksRouter);
 app.use('/api', questionsRouter);
+app.use('/api', sessionsRouter);
 
 app.use(passport.authenticate('jwt', {session: false, failWithError: true}));
 

@@ -3,8 +3,19 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const User = require('../models/user')
 
+function display(LL) {
+
+    let currNode = LL.head;
+    console.log(currNode)
+    while (currNode.next !== null) {
+        console.log(currNode)
+        currNode = currNode.next
+    }
+}
+
 router.get('/users', (req, res, next) => {
     User.find()
+    .populate('decks')
     .then((results) => {
         res.json(results)
     })
@@ -17,6 +28,7 @@ router.get('/users/:id', (req, res, next) => {
     const { id } = req.params;
     
     User.findById(id)
+    .populate('decks')    
     .then((result) => {
         res.json(result)
     })
@@ -61,12 +73,13 @@ router.post('/users', (req, res, next) => {
 
 router.put('/users/:id', (req, res, next) => {
     const { id } = req.params;
-    const { username, password } = req.body;
+    const { username, password, decks } = req.body;
     const options = { new: true }
 
     let newUser = {
         username: username,
-        password: password
+        password: password,
+        decks: decks
     }
 
     User.findByIdAndUpdate(id, newUser, options)

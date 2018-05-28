@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const deckSchema = new mongoose.Schema({
   name: { type: String },
-  head: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', default: null }
+  linkedList: { type: Object, default: null }
 });
 
 deckSchema.set('toObject', {

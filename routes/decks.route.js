@@ -26,8 +26,8 @@ router.get('/decks/:id', (req, res, next) => {
 })
 
 router.post('/decks', (req, res, next) => {
-    const { name, head } = req.body;
-    const newItem = { name, head }
+    const { name, linkedList } = req.body;
+    const newItem = { name, linkedList }
 
     Deck.create(newItem)
     .then((result) => {
@@ -39,9 +39,9 @@ router.post('/decks', (req, res, next) => {
 })
 
 router.put('/decks/:id', (req, res, next) => {
-    const { name, head } = req.body;
+    const { name, linkedList } = req.body;
     const { id } = req.params;
-    const updateItem = { name, head, id };
+    const updateItem = { name, linkedList, id };
 
     //Working, but response is for some reason showing the old value rather than the new.
     Deck.findByIdAndUpdate(id, updateItem)
