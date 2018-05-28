@@ -12,7 +12,6 @@
     "heroku": "node index.js",
     "travis": "npm run mocha"
   },
-  "author": "Joe Turner <jturner@thinkful.com>",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
