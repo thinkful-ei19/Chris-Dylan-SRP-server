@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const jwt = require('jsonwebtoken')
 const config = require('../config')
-const { JWT_SECRET, JWT_EXPIRY } = require('jsonwebtoken');
+
 const localStrategy = require('../passport/local');
 
 function createAuthToken (user) {
@@ -19,7 +19,6 @@ const options = {session: false, failWithError: true};
 const localAuth = passport.authenticate('local', options);
 
 router.post('/login', localAuth, function (req, res) {
-    console.log('test login endpoint')
     const authToken = createAuthToken(req.user);
     return res.json({ authToken });
 });

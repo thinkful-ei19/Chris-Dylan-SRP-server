@@ -1,6 +1,7 @@
 'use strict';
 require('dotenv').config();
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const passport = require('passport')
@@ -19,8 +20,6 @@ const app = express();
 const usersRouter = require('./routes/users.route')
 const authRouter = require('./routes/auth')
 
-app.use(express.json())
-
 app.use(
   morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
     skip: (req, res) => process.env.NODE_ENV === 'test'
@@ -32,6 +31,10 @@ app.use(
     origin: CLIENT_ORIGIN
   })
 );
+
+app.use(express.static('public'));
+
+app.use(express.json())
 
 app.use('/api', usersRouter);
 app.use('/api', authRouter);
