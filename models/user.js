@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    decks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Deck' }],
+    // decks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Deck' }],
 })
 
 userSchema.set('toObject', {

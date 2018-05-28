@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const deckSchema = new mongoose.Schema({
   name: { type: String },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }]
+//   questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }]
 });
 
 deckSchema.index({ name: 1, userId: 1 }, {unique: true});
