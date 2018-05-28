@@ -13,6 +13,18 @@ router.get('/questions', (req, res, next) => {
     })
 })
 
+router.get('/questions/:id', (req, res, next) => {
+    const { id } = req.params;
+
+    Question.findById(id)
+        .then((result) => {
+            res.json(result);
+        })
+        .catch((error) => {
+            next(error);
+        })
+})
+
 router.post('/questions', (req, res, next) => {
     const { question, answer } = req.body;
     const newItem = { question, answer }
@@ -24,6 +36,33 @@ router.post('/questions', (req, res, next) => {
     .catch(err => {
         next(err)
     })
+})
+
+router.put('/questions/:id', (req, res, next) => {
+    const { question, answer } = req.body;
+    const { id } = req.params;
+    const updateItem = { question, answer, id };
+
+    //Working, but response is for some reason showing the old value rather than the new.
+    Question.findByIdAndUpdate(id, updateItem)
+        .then((result) => {
+            res.json(result);
+        })
+        .catch((error) => {
+            next(error);
+        })
+})
+
+router.delete('/questions/:id', (req, res, next) => {
+    const { id } = req.params;
+
+    Question.findByIdAndRemove(id)
+        .then(() => {
+            res.status(204).end();
+        })
+        .catch((err) => {
+            next(err);
+        })
 })
 
 module.exports = router;
