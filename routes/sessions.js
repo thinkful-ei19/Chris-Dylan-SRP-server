@@ -195,7 +195,7 @@ router.put('/edit-item', (req, res, next) => {
                         linkedList: result
                     }
                     Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
-                    res.json(`Deleted question of id: ${questionId} from list and database`)     
+                    res.json(`Updated question of id: ${questionId} from list and database`)     
                 }
             })
             .catch((err) => next(err))
