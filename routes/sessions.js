@@ -281,7 +281,6 @@ router.post('/update-session/:id', (req, res, next) => {
         } else {
             item.head.value.memoryValue = item.head.value.memoryValue * 2;
         }
-        console.log(item.head)
         let reinsert = item.head;
         handleSubmit(item, reinsert, reinsert.value.memoryValue)
         return item;
@@ -293,7 +292,6 @@ router.post('/update-session/:id', (req, res, next) => {
         Deck.findByIdAndUpdate(id, updateObject)
         .then((result) => {
             res.json(result.linkedList.head.next.value);
-            // res.json(result)
         })
         .catch((err) => {next(err)})
     })
