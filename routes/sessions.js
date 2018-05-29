@@ -171,6 +171,11 @@ router.put('/edit-item', (req, res, next) => {
                 let currNode = LL.head;
                 let count = 0;
                 let found = false;
+                if (currNode.value._id === questionId || currNode.value.__id == questionId) {
+                    currNode.value.question = question;
+                    currNode.value.answer = answer;
+                    return LL;     
+                }
                 while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
                     count ++
                     if (String(currNode.value._id) === String(questionId) || String(currNode.value._id) === String(questionId)) {
@@ -194,16 +199,15 @@ router.put('/edit-item', (req, res, next) => {
                 if (result === false) {
                     res.json('Unable to find item')
                 } else {
-                    console.log(result)
                     let updateItem = {
                         linkedList: result
                     }
+                    console.log(updateItem.linkedList)
                     Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
                     res.json(`Updated question of id: ${questionId} from list and database`)     
                 }
             })
             .catch((err) => next(err))
-
         })
         .catch((error) => {
             next(error);
