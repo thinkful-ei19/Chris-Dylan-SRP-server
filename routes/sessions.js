@@ -68,6 +68,7 @@ router.put('/compile-deck/:id', (req, res, next) => {
 router.delete('/delete-item', (req, res, next) => {
     const { deckId, questionId } = req.body;
 
+    console.log(req.body)
     let name;
     Question.findByIdAndRemove(questionId)
     .then(() => {
@@ -78,10 +79,13 @@ router.delete('/delete-item', (req, res, next) => {
             let previousNode = LL.head; 
             let currNode = LL.head;
             let count = 0;
-            let found = false;
-            while (currNode.value._id !== questionId || currNode.next !== null) {
+            let found = false
+            if (currNode.value.__id === questionId) {
+                found = true;
+            }
+            while (currNode.value.__id !== questionId || currNode.next !== null) {
                 count ++
-                if (String(currNode.value._id) === String(questionId)) {
+                if (String(currNode.value.__id) === String(questionId)) {
                     found = true;
                     break
                 }
@@ -91,11 +95,10 @@ router.delete('/delete-item', (req, res, next) => {
                     break
                 }
             }
+            //* With the current way the client-side is set up, it will always delete only the first item in queue. */
             if (count <= 1 && found === true) {
-                console.log('pop head')
                 LL.head = LL.head.next;
             } else if (found === true) {
-                console.log('remove from inbetween')
                 currNode = currNode.next;
                 previousNode.next = currNode;
             }
@@ -106,7 +109,12 @@ router.delete('/delete-item', (req, res, next) => {
                 linkedList: result
             }
             Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
-            res.json(`Deleted question of id: ${questionId} from list and database`)            
+            res.json(result)
+            // if (found === false) {
+            //     res.json(`Unable to find and delete item.`)            
+            // } else {
+            //     res.json(`Deleted ${questionId} from ${deckId}`)
+            // }
         })
         .catch((err) => next(err))
         })
