@@ -114,7 +114,7 @@ router.post('/current/:id', (req, res, next) => {
         }
         Deck.findByIdAndUpdate(id, updateObject)
         .then((result) => {
-            res.json(result);
+            res.json(result.linkedList.head.next.value);
         })
         .catch((err) => {next(err)})
     })
