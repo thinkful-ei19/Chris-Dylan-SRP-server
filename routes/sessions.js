@@ -80,12 +80,16 @@ router.delete('/delete-item', (req, res, next) => {
             let currNode = LL.head;
             let count = 0;
             let found = false
-            if (currNode.value.__id === questionId) {
+
+            if (currNode.value._id === questionId) {
+                found = true;
+            } else if (currNode.value.__id == questionId) {
                 found = true;
             }
-            while (currNode.value.__id !== questionId || currNode.next !== null) {
+            while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
+                console.log(currNode)
                 count ++
-                if (String(currNode.value.__id) === String(questionId)) {
+                if (String(currNode.value._id) === String(questionId) || String(currNode.value.__id) === String(questionId)) {
                     found = true;
                     break
                 }
