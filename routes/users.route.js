@@ -2,9 +2,16 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const User = require('../models/user')
+const Deck = require('../models/deck');
+const LinkedList = require('../linkedList');
+const sample = require('../sampleData/sampleData');
+
+let demoLL = new LinkedList();
+sample.forEach((item) => {
+    demoLL.insertFirst(item)
+})
 
 function display(LL) {
-
     let currNode = LL.head;
     console.log(currNode)
     while (currNode.next !== null) {
@@ -40,38 +47,47 @@ router.get('/users/:id', (req, res, next) => {
 router.post('/users', (req, res, next) => {
     const { username, password } = req.body;
 
-    //Sample Deck
-    const deck = '5b0cc4c57eec0f7dcc54cfd3';
+    const newDeck = {
+        name: 'French',
+        linkedList: demoLL
+    }
 
-    User.find()
-        .then((results) => {
-            let check = false;
-            results.forEach((user) => {
-                if (user.username === username) {
-                    check = true;
+    let deckId;
+
+    Deck.create(newDeck)
+        .then((result) => {
+            deckId = result.id
+            console.log(deckId)
+            User.find()
+            .then((results) => {
+                let check = false;
+                results.forEach((user) => {
+                    if (user.username === username) {
+                        check = true;
+                    }
+                })
+                if (check === true) {
+                    const err = new Error('That username already exists!');
+                    err.status = 400;
+                    return next(err);
+                } else {
+                    return User.hashPassword(password)
+                        .then(digest => {
+                            const newUser = {
+                                username: username,
+                                password: digest,
+                                decks: [deckId]
+                            }
+                            User.create(newUser)
+                                .then((result) => {
+                                    console.log(newUser);
+                                    res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+                                })
+                                .catch((err) => next(err));
+                        })
                 }
             })
-            if (check === true) {
-                const err = new Error('That username already exists!');
-                err.status = 400;
-                return next(err);
-            } else {
-
-                return User.hashPassword(password)
-                    .then(digest => {
-                        const newUser = {
-                            username: username,
-                            password: digest,
-                            decks: [deck]
-                        }
-                        User.create(newUser)
-                            .then((result) => {
-                                console.log(newUser);
-                                res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
-                            })
-                            .catch((err) => next(err));
-                    })
-            }
+            .catch(err => next(err))
         })
 })
 
