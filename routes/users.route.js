@@ -80,7 +80,7 @@ router.post('/users', (req, res, next) => {
                             }
                             User.create(newUser)
                                 .then((result) => {
-                                    console.log(newUser);
+                                    // console.log(newUser);
                                     res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
                                 })
                                 .catch((err) => next(err));
