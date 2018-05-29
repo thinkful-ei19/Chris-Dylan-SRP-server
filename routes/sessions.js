@@ -171,9 +171,9 @@ router.put('/edit-item', (req, res, next) => {
                 let currNode = LL.head;
                 let count = 0;
                 let found = false;
-                while (currNode.value._id !== questionId || currNode.next !== null) {
+                while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
                     count ++
-                    if (String(currNode.value._id) === String(questionId)) {
+                    if (String(currNode.value._id) === String(questionId) || String(currNode.value._id) === String(questionId)) {
                         found = true;
                         break
                     }
