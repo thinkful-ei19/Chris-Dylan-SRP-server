@@ -38,7 +38,7 @@ router.post('/new', (req, res, next) => {
 })
 
 router.put('/new/:id', (req, res, next) => {
-
+    //CONTINUE FROM HERE, MAKE THE DECKS BUILD PROPERLY WITH THEIR RESPECTIVE DECKID
     const { id } = req.params;
     let deck = new LinkedList();
 
@@ -56,7 +56,6 @@ router.put('/new/:id', (req, res, next) => {
             console.log(updateItem)
         })
         .catch(err => next(err))
-    
 
 })
 
@@ -81,8 +80,6 @@ router.post('/current/:id', (req, res, next) => {
     function handleSubmit(LL, reinsert, number) {
 
         let insert = reinsert;
-        // insert.next = null
-        // const newNode = new _Node(insert)
 
         if (!LL.head) {
             return null;

@@ -40,6 +40,9 @@ router.get('/users/:id', (req, res, next) => {
 router.post('/users', (req, res, next) => {
     const { username, password } = req.body;
 
+    //Sample Deck
+    const deck = '5b0cc4c57eec0f7dcc54cfd3';
+
     User.find()
         .then((results) => {
             let check = false;
@@ -58,7 +61,8 @@ router.post('/users', (req, res, next) => {
                     .then(digest => {
                         const newUser = {
                             username: username,
-                            password: digest
+                            password: digest,
+                            decks: [deck]
                         }
                         User.create(newUser)
                             .then((result) => {

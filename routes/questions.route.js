@@ -26,8 +26,8 @@ router.get('/questions/:id', (req, res, next) => {
 })
 
 router.post('/questions', (req, res, next) => {
-    const { question, answer } = req.body;
-    const newItem = { question, answer }
+    const { question, answer, deckId } = req.body;
+    const newItem = { question, answer, deckId }
 
     Question.create(newItem)
     .then((result) => {
@@ -40,9 +40,9 @@ router.post('/questions', (req, res, next) => {
 })
 
 router.put('/questions/:id', (req, res, next) => {
-    const { question, answer } = req.body;
+    const { question, answer, deckId } = req.body;
     const { id } = req.params;
-    const updateItem = { question, answer, id };
+    const updateItem = { question, answer, id, deckId };
 
     //Working, but response is for some reason showing the old value rather than the new.
     Question.findByIdAndUpdate(id, updateItem)
