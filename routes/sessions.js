@@ -37,6 +37,29 @@ router.post('/new', (req, res, next) => {
     })
 })
 
+router.put('/new/:id', (req, res, next) => {
+
+    const { id } = req.params;
+    let deck = new LinkedList();
+
+    Question.find()
+        .then((result) => {
+            result.forEach((item) => {
+                console.log(item)
+                if (item.deck === id) {
+                    deck.insertFirst(item)
+                }
+            })
+            const updateItem = {
+                linkedList: deck.head
+            }
+            console.log(updateItem)
+        })
+        .catch(err => next(err))
+    
+
+})
+
 router.get('/current/:id', (req, res, next) => {
     const { id } = req.params;
     console.log(id)
@@ -71,14 +94,26 @@ router.post('/current/:id', (req, res, next) => {
             let currNode = LL.head;
             let previousNode = LL.head;
             let loopComplete = false;
+            let count = 0;
             while (currNode !== null) {
+                count ++
                 previousNode = currNode; //count -1
                 currNode = currNode.next; //count -0
                 if (currNode.value.memoryValue >= number+1) {
-                    let placeholder = reinsert;
-                    LL.head = LL.head.next;                   
-                    placeholder.next = currNode;
-                    previousNode.next = placeholder;
+                    if (count === 1) {
+                        //If the card is going to be relegated back to the start, just push it back a few spots instead.
+                        previousNode = currNode.next;
+                        currNode = currNode.next.next;
+                        let placeholder = reinsert;
+                        LL.head = LL.head.next;                   
+                        placeholder.next = currNode;
+                        previousNode.next = placeholder;
+                    } else {
+                        let placeholder = reinsert;
+                        LL.head = LL.head.next;                   
+                        placeholder.next = currNode;
+                        previousNode.next = placeholder;
+                    }
                     break           
                 } else if (currNode.next === null) {    
                     loopComplete = true;
@@ -104,6 +139,7 @@ router.post('/current/:id', (req, res, next) => {
         } else {
             item.head.value.memoryValue = item.head.value.memoryValue * 2;
         }
+        console.log(item.head)
         let reinsert = item.head;
         handleSubmit(item, reinsert, reinsert.value.memoryValue)
         return item;
@@ -115,6 +151,7 @@ router.post('/current/:id', (req, res, next) => {
         Deck.findByIdAndUpdate(id, updateObject)
         .then((result) => {
             res.json(result.linkedList.head.next.value);
+            // res.json(result)
         })
         .catch((err) => {next(err)})
     })
