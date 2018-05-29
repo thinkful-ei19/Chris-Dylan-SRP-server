@@ -13,6 +13,7 @@ class _Node {
     }
 }
 
+// Tester function to build a single deck with all questions in database
 router.post('/new', (req, res, next) => {
 
     let deck = new LinkedList();
@@ -37,29 +38,169 @@ router.post('/new', (req, res, next) => {
     })
 })
 
-router.put('/new/:id', (req, res, next) => {
-    //CONTINUE FROM HERE, MAKE THE DECKS BUILD PROPERLY WITH THEIR RESPECTIVE DECKID
+//This endpoint builds a new deck by getting the deckIds of questions that match its own ID.
+router.put('/compile-deck/:id', (req, res, next) => {
     const { id } = req.params;
+    const { name } = req.body;
     let deck = new LinkedList();
 
     Question.find()
         .then((result) => {
             result.forEach((item) => {
-                console.log(item)
-                if (item.deck === id) {
+                if (item.deckId === id) {
                     deck.insertFirst(item)
                 }
             })
-            const updateItem = {
-                linkedList: deck.head
+            let newDeck = {
+                name: name,
+                linkedList: deck
             }
-            console.log(updateItem)
+            Deck.findByIdAndUpdate(id, newDeck)
+            .then((result) => {
+                console.log(result)
+            });
+            res.json(newDeck)
         })
         .catch(err => next(err))
+})
+
+//Handle deletion of linkedList Items
+router.delete('/delete-item', (req, res, next) => {
+    const { deckId, questionId } = req.body;
+
+    let name;
+    Question.findByIdAndRemove(questionId)
+    .then(() => {
+        Deck.findById(deckId)
+        .then((result) => {
+            name = result.name
+            let LL = result.linkedList;
+            let previousNode = LL.head; 
+            let currNode = LL.head;
+            let count = 0;
+            let found = false;
+            while (currNode.value._id !== questionId || currNode.next !== null) {
+                count ++
+                if (String(currNode.value._id) === String(questionId)) {
+                    found = true;
+                    break
+                }
+                previousNode = currNode;
+                currNode = currNode.next
+                if (currNode.next === null) {
+                    break
+                }
+            }
+            if (count <= 1 && found === true) {
+                console.log('pop head')
+                LL.head = LL.head.next;
+            } else if (found === true) {
+                console.log('remove from inbetween')
+                currNode = currNode.next;
+                previousNode.next = currNode;
+            }
+            return LL;
+        })
+        .then((result) => {       
+            let updateItem = {
+                linkedList: result
+            }
+            Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
+            res.json(`Deleted question of id: ${questionId} from list and database`)            
+        })
+        .catch((err) => next(err))
+        })
+    .catch((err) => {
+        next(err);
+    })   
+})
+
+//Allow users to add items to linked list and database
+router.post('/add-item', (req,res, next) => {
+    const { question, answer, deckId } = req.body;
+    const newItem = { question, answer, deckId }
+
+    Question.create(newItem)
+    .then((result) => {
+        const newHeadValue = result;
+        Deck.findById(deckId)
+            .then((result) => {
+                let LL = result.linkedList; //Grab LL
+                LL.head = new _Node(newHeadValue, LL.head);
+                return LL;
+            })
+            .then((result) => { 
+                let updateItem = {
+                    linkedList: result
+                }
+                Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
+                res.json(`Added question ${question} to list and database`)     
+            })
+            .catch(err => next(err))
+    })
+    .catch(err => {
+        next(err)
+    })
 
 })
 
-router.get('/current/:id', (req, res, next) => {
+//Allows user to edit items in the linked list and database simultaneously.
+router.put('/edit-item', (req, res, next) => {
+
+    const { deckId, questionId, question, answer } = req.body;
+
+    const updateItem = { question, answer, deckId };
+
+    Question.findByIdAndUpdate(questionId, updateItem)
+        .then((result) => {
+            Deck.findById(deckId)
+            .then((result) => {
+                let LL = result.linkedList;
+                let currNode = LL.head;
+                let count = 0;
+                let found = false;
+                while (currNode.value._id !== questionId || currNode.next !== null) {
+                    count ++
+                    if (String(currNode.value._id) === String(questionId)) {
+                        found = true;
+                        break
+                    }
+                    currNode = currNode.next
+                    if (currNode.next === null) {
+                        break
+                    }
+                }
+                if (found === true) {
+                    currNode.value.question = question;
+                    currNode.value.answer = answer;
+                    return LL;                    
+                } else {
+                    return false
+                }
+            })
+            .then((result) => { 
+                if (result === false) {
+                    res.json('Unable to find item')
+                } else {
+                    console.log(result)
+                    let updateItem = {
+                        linkedList: result
+                    }
+                    Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
+                    res.json(`Deleted question of id: ${questionId} from list and database`)     
+                }
+            })
+            .catch((err) => next(err))
+
+        })
+        .catch((error) => {
+            next(error);
+        })
+})
+
+
+//Start sessions by getting the first question in a linkedList.
+router.get('/start-session/:id', (req, res, next) => {
     const { id } = req.params;
     console.log(id)
 
@@ -73,14 +214,18 @@ router.get('/current/:id', (req, res, next) => {
     })
 })
 
-router.post('/current/:id', (req, res, next) => {
+//Main driver for sessions.
+router.post('/update-session/:id', (req, res, next) => {
     const { id } = req.params;
     const { correct } = req.body;
 
+    //Algorithm
+    //1. Ensure that the LL is valid, initiate variables for current node, previous node, count and loop status
+    //  (count is to prevent consistent front-loading of the same question, and loop status is used to determine what to do with a value to be put at the end)
+    //2. Iterate through the LL, if the node to be reinserted is to be reinserted at the beginning, instead reinsert it 3 nodes away.
+    //3. Otherwise, insert the node before the first node where the memoryValue is higher.
     function handleSubmit(LL, reinsert, number) {
-
         let insert = reinsert;
-
         if (!LL.head) {
             return null;
         }
