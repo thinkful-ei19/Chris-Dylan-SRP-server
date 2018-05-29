@@ -38,6 +38,10 @@ Guide to Endpoints:
                         *Optional
                             *{ linkedList } = req.body
 
+    Create New User
+        POST /api/users
+            Requires
+                { username, password } = req.body;
 
 
 Other Endpoints:
