@@ -348,4 +348,28 @@ router.put('/increment-count/:id', (req, res, next) => {
     .catch((err) => next(err));
 })
 
+router.get('/deck-list/:id', (req, res, next) => {
+    const { id } = req.params;
+
+    let decks = []
+
+    User.findById(id)
+    .then((result) => {
+        result.decks.forEach((deck) => {
+            Deck.findById(deck)
+            .then((result) => {
+                deck = {
+                    name: result.name,
+                    id: result.id
+                }
+                decks.push(deck)
+                return decks
+            })
+        })
+        setTimeout(function() {res.json({decks})}, 1000)
+        return ({decks})
+    })
+    .catch((err) => next(err))
+})
+
 module.exports = router;
