@@ -213,15 +213,18 @@ router.post('/update-session/:id', (req, res, next) => {
         }
 
         //If 2nd LL value has higher M value;
-        if (LL.head.next.value.memoryValue > number) {
-            //Insert after first.
-            let origHead = LL.head;
-            LL.head = LL.head.next;
-            origHead.next = LL.head.next;
-            LL.head.next = origHead;
-            return LL
-        }
-
+        try {
+            //Attempt swap of head and 2nd value, this will fail if only 1 card in deck.
+            //The LL will be returned with the new M value for the single card if this fails.
+            if (LL.head.next.value.memoryValue > number) {
+                //Insert after first.
+                let origHead = LL.head;
+                LL.head = LL.head.next;
+                origHead.next = LL.head.next;
+                LL.head.next = origHead;
+                return LL
+            }
+        } catch(err) {}
         let currNode = LL.head;
         let previousNode = LL.head; 
         while (currNode.next !== null) {
