@@ -317,4 +317,32 @@ router.post('/update-session/:id', (req, res, next) => {
 
 })
 
+router.get('/get-count/:id', (req, res, next) => {
+    const { id } = req.params;
+
+    User.findById(id)
+    .then(result => {
+        res.json({totalCorrect: result.totalCorrect})
+    })
+    .catch((err) => next(err));
+})
+
+router.put('/increment-count/:id', (req, res, next) => {
+    const { id } = req.params;
+
+    let updateItem;
+
+    User.findById(id)
+    .then(result => {
+        updateItem = result;
+        updateItem.totalCorrect = updateItem.totalCorrect + 1;
+        User.findByIdAndUpdate(id, updateItem)
+        .then((result) => {
+            res.json(result)
+        })
+        .catch((err) => next(err))
+    })
+    .catch((err) => next(err));
+})
+
 module.exports = router;

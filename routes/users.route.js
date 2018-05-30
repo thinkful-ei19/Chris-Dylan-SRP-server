@@ -57,7 +57,6 @@ router.post('/users', (req, res, next) => {
     Deck.create(newDeck)
         .then((result) => {
             deckId = result.id
-            console.log(deckId)
             User.find()
             .then((results) => {
                 let check = false;
@@ -101,6 +100,8 @@ router.put('/users/:id', (req, res, next) => {
         password: password,
         decks: decks
     }
+
+    console.log(newUser)
 
     User.findByIdAndUpdate(id, newUser, options)
         .then((result) => {

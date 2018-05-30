@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     decks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Deck' }],
+    totalCorrect: { type: Number, default: 0}
 })
 
 userSchema.set('toObject', {
