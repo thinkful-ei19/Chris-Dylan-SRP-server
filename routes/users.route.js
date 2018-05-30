@@ -79,7 +79,6 @@ router.post('/users', (req, res, next) => {
                             }
                             User.create(newUser)
                                 .then((result) => {
-                                    // console.log(newUser);
                                     res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
                                 })
                                 .catch((err) => next(err));
@@ -100,8 +99,6 @@ router.put('/users/:id', (req, res, next) => {
         password: password,
         decks: decks
     }
-
-    console.log(newUser)
 
     User.findByIdAndUpdate(id, newUser, options)
         .then((result) => {

@@ -9,7 +9,7 @@ router.get('/questions', (req, res, next) => {
         res.json(result)
     })
     .catch((err) => {
-        console.error(err)
+        next(err)
     })
 })
 

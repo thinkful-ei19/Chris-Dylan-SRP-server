@@ -18,7 +18,6 @@ router.get('/decks/:id', (req, res, next) => {
     const { id } = req.params;
     Deck.findById(id)
     .then((result) => {
-        console.log(result)
         res.json(result);
     })
     .catch((err) => {
