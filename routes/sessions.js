@@ -201,21 +201,12 @@ router.post('/update-session/:id', (req, res, next) => {
     const { id } = req.params;
     const { correct } = req.body;
 
-    //Algorithm
-    //1. Ensure that the LL is valid
-    //2a. Iterate through the LL, if the node to be reinserted is to be reinserted at the beginning, insert it one after instead.
-    //2b. Otherwise, insert the node before the first node where the memoryValue is higher.
-    //2c. If the while loop gets to point where the next value is null, reinsert at that point.
-    //3. Set the new head of the LL to be the next value when doing the swaps.
     function handleSubmit(LL, reinsert, number) {
         if (!LL.head) {
             return null;
         }
 
-        //If 2nd LL value has higher M value;
         try {
-            //Attempt swap of head and 2nd value, this will fail if only 1 card in deck.
-            //The LL will be returned with the new M value for the single card if this fails.
             if (LL.head.next.value.memoryValue > number) {
                 //Insert after first.
                 let origHead = LL.head;
@@ -231,14 +222,12 @@ router.post('/update-session/:id', (req, res, next) => {
             previousNode = currNode;
             currNode = currNode.next;
             if (currNode.value.memoryValue > number) {
-                //Insert inbetween
                 previousNode.next = reinsert;
                 LL.head = LL.head.next;
                 reinsert.next = currNode;
                 break
             }
             if (currNode.next === null) {
-                //Insert at end
                 currNode.next = reinsert;
                 LL.head = LL.head.next;                
                 reinsert.next = null;                
