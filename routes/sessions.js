@@ -88,9 +88,10 @@ router.delete('/delete-item', (req, res, next) => {
             } else if (currNode.value.__id == questionId) {
                 found = true;
             }
+            //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.            
             while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
                 count ++
-                if (String(currNode.value._id) === String(questionId) || String(currNode.value.__id) === String(questionId)) {
+                if (currNode.value._id === questionId || currNode.value.__id === questionId) {
                     found = true;
                     break
                 }
@@ -132,8 +133,6 @@ router.delete('/delete-item', (req, res, next) => {
 router.post('/add-item', (req,res, next) => {
     const { question, answer, deckId } = req.body;
     const newItem = { question, answer, deckId }
-
-    console.log('add')
 
     Question.create(newItem)
     .then((result) => {
@@ -206,7 +205,6 @@ router.put('/edit-item', (req, res, next) => {
                     let updateItem = {
                         linkedList: result
                     }
-                    console.log(updateItem.linkedList)
                     Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
                     res.json(`Updated question of id: ${questionId} from list and database`)     
                 }
