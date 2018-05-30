@@ -102,18 +102,21 @@ router.post('/add-item', (req,res, next) => {
         const newHeadValue = result;
         Deck.findById(deckId)
             .then((result) => {
-                let LL = result.linkedList; //Grab LL
-                if (LL === null) {
+                let LL;
+                if (result.linkedList === null) {
                     LL = new LinkedList();
+                    LL.head = new _Node(newHeadValue, null);
+                } else {
+                    LL = result.linkedList;
+                    LL.head = new _Node(newHeadValue, LL.head);
                 }
-                LL.head = new _Node(newHeadValue, LL.head);
                 return LL;
             })
             .then((result) => { 
                 let updateItem = {
                     linkedList: result
                 }
-                Deck.findByIdAndUpdate(deckId, updateItem).then((result) => {return})
+                Deck.findByIdAndUpdate(deckId, updateItem).then((result) => {return}).catch(err => next(err))
                 res.json(`Added question ${question} to list and database`)     
             })
             .catch(err => next(err))
