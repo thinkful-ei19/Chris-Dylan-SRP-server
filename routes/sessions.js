@@ -139,21 +139,23 @@ router.put('/edit-item', (req, res, next) => {
                 let count = 0;
                 let found = false;
                 //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.                
-                if (currNode.value._id === questionId || currNode.value.__id == questionId) {
+                if (currNode.value._id == questionId || currNode.value.__id == questionId) {
+                    console.log('this ran')
                     currNode.value.question = question;
                     currNode.value.answer = answer;
                     return LL;     
                 }
-                while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
+                while (currNode.value._id !== questionId || currNode.value.__id !== questionId) {
                     count ++
+                    
                     if (currNode.value._id === questionId || currNode.value._id === questionId) {
                         found = true;
                         break
                     }
-                    currNode = currNode.next
                     if (currNode.next === null) {
                         break
                     }
+                    currNode = currNode.next
                 }
                 if (found === true) {
                     currNode.value.question = question;
@@ -205,7 +207,6 @@ router.post('/update-session/:id', (req, res, next) => {
         if (!LL.head) {
             return null;
         }
-
         try {
             if (LL.head.next.value.memoryValue > number) {
                 //Insert after first.
@@ -319,6 +320,33 @@ router.get('/deck-list/:id', (req, res, next) => {
         return ({decks})
     })
     .catch((err) => next(err))
+})
+
+router.post('/add-deck', (req, res, next) => {
+    const { name, userId } = req.body;
+    const newItem = { name }
+
+    console.log(req.body)
+
+    Deck.create(newItem)
+    .then((result) => {
+        const deckId = result.id;
+        User.findById(userId)
+        .then((result) => {
+            console.log(result)
+            let updateItem = result;
+            updateItem.decks.push(deckId)
+            console.log(updateItem)            
+            User.findByIdAndUpdate(userId, updateItem)
+            .then((result) => {
+                res.json(`Deck created for ${updateItem.username} with deckId of ${deckId}`)
+            }).catch(err => next(err))
+        })
+        .catch(err => next(err))
+    })
+    .catch(err => {
+        next(err)
+    })
 })
 
 module.exports = router;
