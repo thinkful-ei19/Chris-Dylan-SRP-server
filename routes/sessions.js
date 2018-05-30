@@ -55,12 +55,10 @@ router.delete('/delete-item', (req, res, next) => {
             let count = 0;
             let found = false
 
-            if (currNode.value._id === questionId) {
-                found = true;
-            } else if (currNode.value.__id == questionId) {
+            //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.            
+            if (currNode.value._id === questionId || currNode.value.__id == questionId) {
                 found = true;
             }
-            //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.            
             while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
                 count ++
                 if (currNode.value._id === questionId || currNode.value.__id === questionId) {
@@ -140,12 +138,12 @@ router.put('/edit-item', (req, res, next) => {
                 let currNode = LL.head;
                 let count = 0;
                 let found = false;
+                //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.                
                 if (currNode.value._id === questionId || currNode.value.__id == questionId) {
                     currNode.value.question = question;
                     currNode.value.answer = answer;
                     return LL;     
                 }
-                //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.
                 while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
                     count ++
                     if (currNode.value._id === questionId || currNode.value._id === questionId) {
