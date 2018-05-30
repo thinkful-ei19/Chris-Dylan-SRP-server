@@ -179,9 +179,10 @@ router.put('/edit-item', (req, res, next) => {
                     currNode.value.answer = answer;
                     return LL;     
                 }
+                //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.
                 while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
                     count ++
-                    if (String(currNode.value._id) === String(questionId) || String(currNode.value._id) === String(questionId)) {
+                    if (currNode.value._id === questionId || currNode.value._id === questionId) {
                         found = true;
                         break
                     }
@@ -244,55 +245,38 @@ router.post('/update-session/:id', (req, res, next) => {
     //2c. If the while loop completes, it means the next value of current node is null, set that to be the reinserted value
     //3. Set the new head of the LL to be the next value.
     function handleSubmit(LL, reinsert, number) {
-        let insert = reinsert;
         if (!LL.head) {
             return null;
         }
 
+        //If 2nd LL value has higher M value;
+        if (LL.head.next.value.memoryValue > number) {
+            //Insert after first.
+            let origHead = LL.head;
+            LL.head = LL.head.next;
+            origHead.next = LL.head.next;
+            LL.head.next = origHead;
+            return LL
+        }
+
         let currNode = LL.head;
-        let previousNode = LL.head;
-        // let loopComplete = false;
-        let count = 0;
-        while (currNode.next !== null) {            
-            count ++            
-            console.log(currNode.next)
-            if (currNode.value.memoryValue >= number+1) {
-                //Memory value of currNode is higher/equal to than memory value of answered question.
-                if (count === 1) {
-                    //If the card is going to be relegated back to the start, just push it back a few spots instead.
-                    previousNode = currNode.next.next;
-                    currNode = currNode.next.next.next;
-                    //Swap
-                    let placeholder = reinsert;
-                    LL.head = LL.head.next;                   
-                    placeholder.next = currNode;
-                    previousNode.next = placeholder;
-                } else {
-                    //Insert node at current point in LL                    
-                    previousNode = currNode; //count -1
-                    currNode = currNode.next; //count -0
-                    //Swap
-                    let placeholder = reinsert;
-                    LL.head = LL.head.next;                   
-                    placeholder.next = currNode;
-                    previousNode.next = placeholder;
-                }
-                break           
-            } else if (currNode.next.next === null) {   
-                //Reached the end of the loop 
-                // loopComplete = true;
-                previousNode = currNode; //count -1
-                currNode = currNode.next; //count -0
-                //Swap
-                let placeholder = reinsert;
+        let previousNode = LL.head; 
+        while (currNode.next !== null) {
+            previousNode = currNode;
+            currNode = currNode.next;
+            if (currNode.value.memoryValue > number) {
+                //Insert inbetween
+                previousNode.next = reinsert;
                 LL.head = LL.head.next;
-                placeholder.next = null;
-                currNode.next = placeholder
-                return LL;  
+                reinsert.next = currNode;
                 break
-            } else {
-                previousNode = currNode; //count -1
-                currNode = currNode.next; //count -0
+            }
+            if (currNode.next === null) {
+                //Insert at end
+                currNode.next = reinsert;
+                LL.head = LL.head.next;                
+                reinsert.next = null;                
+                break;
             }
         }
         return LL;
