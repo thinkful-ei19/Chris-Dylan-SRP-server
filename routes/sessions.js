@@ -132,6 +132,8 @@ router.post('/add-item', (req,res, next) => {
     const { question, answer, deckId } = req.body;
     const newItem = { question, answer, deckId }
 
+    console.log('add')
+
     Question.create(newItem)
     .then((result) => {
         const newHeadValue = result;
