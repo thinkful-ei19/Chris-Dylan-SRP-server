@@ -68,10 +68,11 @@ router.put('/compile-deck/:id', (req, res, next) => {
 router.delete('/delete-item', (req, res, next) => {
     const { deckId, questionId } = req.body;
 
-    console.log(req.body)
+    console.log(questionId)
+
     let name;
     Question.findByIdAndRemove(questionId)
-    .then(() => {
+    .then((result) => {
         Deck.findById(deckId)
         .then((result) => {
             name = result.name
@@ -81,13 +82,13 @@ router.delete('/delete-item', (req, res, next) => {
             let count = 0;
             let found = false
 
+
             if (currNode.value._id === questionId) {
                 found = true;
             } else if (currNode.value.__id == questionId) {
                 found = true;
             }
             while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
-                console.log(currNode)
                 count ++
                 if (String(currNode.value._id) === String(questionId) || String(currNode.value.__id) === String(questionId)) {
                     found = true;
@@ -247,46 +248,42 @@ router.post('/update-session/:id', (req, res, next) => {
         if (!LL.head) {
             return null;
         }
-        if (number === 0) {
-            LL.insertFirst(newItem)
-            return
-        } else {
-            let currNode = LL.head;
-            let previousNode = LL.head;
-            let loopComplete = false;
-            let count = 0;
-            while (currNode !== null) {
-                count ++
-                previousNode = currNode; //count -1
-                currNode = currNode.next; //count -0
-                if (currNode.value.memoryValue >= number+1) {
-                    if (count === 1) {
-                        //If the card is going to be relegated back to the start, just push it back a few spots instead.
-                        previousNode = currNode.next;
-                        currNode = currNode.next.next;
-                        let placeholder = reinsert;
-                        LL.head = LL.head.next;                   
-                        placeholder.next = currNode;
-                        previousNode.next = placeholder;
-                    } else {
-                        let placeholder = reinsert;
-                        LL.head = LL.head.next;                   
-                        placeholder.next = currNode;
-                        previousNode.next = placeholder;
-                    }
-                    break           
-                } else if (currNode.next === null) {    
-                    loopComplete = true;
-                    break
+
+        let currNode = LL.head;
+        let previousNode = LL.head;
+        let loopComplete = false;
+        let count = 0;
+        while (currNode.next !== null) {
+            count ++
+            if (currNode.value.memoryValue >= number+1) {
+                if (count === 1) {
+                    //If the card is going to be relegated back to the start, just push it back a few spots instead.
+                    previousNode = currNode.next;
+                    currNode = currNode.next.next;
+                    let placeholder = reinsert;
+                    LL.head = LL.head.next;                   
+                    placeholder.next = currNode;
+                    previousNode.next = placeholder;
+                } else {
+                    let placeholder = reinsert;
+                    LL.head = LL.head.next;                   
+                    placeholder.next = currNode;
+                    previousNode.next = placeholder;
                 }
-            }        
-            if (loopComplete === true) {
-                let placeholder = reinsert;
-                LL.head = LL.head.next;
-                placeholder.next = null;
-                currNode.next = placeholder
-                return LL;                
+                break           
+            } else if (currNode.next === null) {    
+                loopComplete = true;
+                break
             }
+            previousNode = currNode; //count -1
+            currNode = currNode.next; //count -0
+        }
+        if (loopComplete === true) {
+            let placeholder = reinsert;
+            LL.head = LL.head.next;
+            placeholder.next = null;
+            currNode.next = placeholder
+            return LL;                
         }
         return LL;
     }
@@ -309,7 +306,11 @@ router.post('/update-session/:id', (req, res, next) => {
         }
         Deck.findByIdAndUpdate(id, updateObject)
         .then((result) => {
-            res.json(result.linkedList.head.next.value);
+            if (result.linkedList.head.next !== null) {
+                res.json(result.linkedList.head.next.value);
+            } else {
+                res.json(result.linkedList.head.value)
+            }
         })
         .catch((err) => {next(err)})
     })
