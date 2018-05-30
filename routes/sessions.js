@@ -32,7 +32,7 @@ router.put('/compile-deck/:id', (req, res, next) => {
             }
             Deck.findByIdAndUpdate(id, newDeck)
             .then((result) => {
-                console.log(result)
+                {return}
             });
             res.json(newDeck)
         })
@@ -43,33 +43,31 @@ router.put('/compile-deck/:id', (req, res, next) => {
 router.delete('/delete-item', (req, res, next) => {
     const { deckId, questionId } = req.body;
 
-    let name;
     Question.findByIdAndRemove(questionId)
     .then((result) => {
         Deck.findById(deckId)
         .then((result) => {
-            name = result.name
             let LL = result.linkedList;
             let previousNode = LL.head; 
             let currNode = LL.head;
             let count = 0;
             let found = false
-
+            
             //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.            
-            if (currNode.value._id === questionId || currNode.value.__id == questionId) {
+            if (String(currNode.value._id) === questionId || String(currNode.value.__id) == questionId) {
                 found = true;
             }
-            while (currNode.value._id !== questionId || currNode.value.__id !== questionId || currNode.next !== null) {
+            while (String(currNode.value._id) !== questionId || String(currNode.value.__id) !== questionId || currNode.next !== null) {
                 count ++
-                if (currNode.value._id === questionId || currNode.value.__id === questionId) {
+                if (String(currNode.value._id) === questionId || String(currNode.value.__id) === questionId) {
                     found = true;
+                    break
+                }
+                if (currNode.next === null) {
                     break
                 }
                 previousNode = currNode;
                 currNode = currNode.next
-                if (currNode.next === null) {
-                    break
-                }
             }
             //* With the current way the client-side is set up, it will always delete only the first item in queue. */
             if (count <= 1 && found === true) {
@@ -84,7 +82,7 @@ router.delete('/delete-item', (req, res, next) => {
             let updateItem = {
                 linkedList: result
             }
-            Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
+            Deck.findByIdAndUpdate(deckId, updateItem).then((result) => {return})
             res.json(result)
         })
         .catch((err) => next(err))
@@ -105,6 +103,9 @@ router.post('/add-item', (req,res, next) => {
         Deck.findById(deckId)
             .then((result) => {
                 let LL = result.linkedList; //Grab LL
+                if (LL === null) {
+                    LL = new LinkedList();
+                }
                 LL.head = new _Node(newHeadValue, LL.head);
                 return LL;
             })
@@ -112,7 +113,7 @@ router.post('/add-item', (req,res, next) => {
                 let updateItem = {
                     linkedList: result
                 }
-                Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
+                Deck.findByIdAndUpdate(deckId, updateItem).then((result) => {return})
                 res.json(`Added question ${question} to list and database`)     
             })
             .catch(err => next(err))
@@ -139,16 +140,15 @@ router.put('/edit-item', (req, res, next) => {
                 let count = 0;
                 let found = false;
                 //MongoDB for some reason changes id to be either _id or __id. Need to fix this so that this can be refactored.                
-                if (currNode.value._id == questionId || currNode.value.__id == questionId) {
-                    console.log('this ran')
+                if (String(currNode.value._id) == questionId || String(currNode.value.__id) == questionId) {
                     currNode.value.question = question;
                     currNode.value.answer = answer;
                     return LL;     
                 }
-                while (currNode.value._id !== questionId || currNode.value.__id !== questionId) {
+                while (String(currNode.value._id) !== questionId || String(currNode.value.__id) !== questionId) {
                     count ++
                     
-                    if (currNode.value._id === questionId || currNode.value._id === questionId) {
+                    if (String(currNode.value._id) === questionId || String(currNode.value.__id) === questionId) {
                         found = true;
                         break
                     }
@@ -172,7 +172,7 @@ router.put('/edit-item', (req, res, next) => {
                     let updateItem = {
                         linkedList: result
                     }
-                    Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
+                    Deck.findByIdAndUpdate(deckId, updateItem).then((result) => {return})
                     res.json(`Updated question of id: ${questionId} from list and database`)     
                 }
             })
@@ -305,18 +305,27 @@ router.get('/deck-list/:id', (req, res, next) => {
 
     User.findById(id)
     .then((result) => {
+        let error = false;
         result.decks.forEach((deck) => {
             Deck.findById(deck)
             .then((result) => {
-                deck = {
-                    name: result.name,
-                    id: result.id
+                if (result !== null) {
+                    deck = {
+                        name: result.name,
+                        id: result.id
+                    }
+                    decks.push(deck)
                 }
-                decks.push(deck)
                 return decks
             })
+            .catch(err => {
+                error = true;
+                return next(err)
+            })
         })
-        setTimeout(function() {res.json({decks})}, 1000)
+        if (error === false) {
+            setTimeout(function() {res.json({decks})}, 1000)
+        }
         return ({decks})
     })
     .catch((err) => next(err))
@@ -326,17 +335,13 @@ router.post('/add-deck', (req, res, next) => {
     const { name, userId } = req.body;
     const newItem = { name }
 
-    console.log(req.body)
-
     Deck.create(newItem)
     .then((result) => {
         const deckId = result.id;
         User.findById(userId)
         .then((result) => {
-            console.log(result)
             let updateItem = result;
             updateItem.decks.push(deckId)
-            console.log(updateItem)            
             User.findByIdAndUpdate(userId, updateItem)
             .then((result) => {
                 res.json(`Deck created for ${updateItem.username} with deckId of ${deckId}`)

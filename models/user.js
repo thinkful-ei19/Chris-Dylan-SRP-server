@@ -18,7 +18,7 @@ userSchema.set('toObject', {
 });
 
 userSchema.methods.validatePassword = function (password) {
-    console.log('passwords are: ', password, this.password)
+    // console.log('passwords are: ', password, this.password)
     return bcrypt.compare(password, this.password);
 };
 

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const Deck = require('../models/deck')
+const Deck = require('../models/deck');
+const User = require('../models/user');
 
 router.get('/decks', (req, res, next) => {
     Deck.find()
@@ -15,9 +16,9 @@ router.get('/decks', (req, res, next) => {
 
 router.get('/decks/:id', (req, res, next) => {
     const { id } = req.params;
-    
     Deck.findById(id)
     .then((result) => {
+        console.log(result)
         res.json(result);
     })
     .catch((err) => {
@@ -55,6 +56,25 @@ router.put('/decks/:id', (req, res, next) => {
 
 router.delete('/decks/:id', (req, res, next) => {
     const { id } = req.params;
+    const { userId } = req.body;
+    let updateUser;
+    User.findById(userId)
+        .then((result) => {
+            let decks = [];
+            updateUser = result;
+            updateUser.decks.forEach((deckId) => {
+                if (String(deckId) !== id) {
+                    decks.push(deckId)
+                }                
+            })
+            updateUser.decks = decks;
+            return updateUser;
+        })
+        .then((result) => {
+            User.findByIdAndUpdate(userId, updateUser)
+            return;
+        })
+        .catch(err => next(err))
 
     Deck.findByIdAndRemove(id)
         .then((result) => {
