@@ -52,11 +52,5 @@ Other Endpoints:
         Requires
             { deckId } in req.params;
             { name } in req.body;
-
-    Compile Test Deck
-    POST: /api/new
-        (No body required)
-        Will compile a new deck with all questions in the database. For test purposes only.
-
     To be continued...
     There are numerous other endpoints for CRUD operations for users, questions and decks.

@@ -13,31 +13,6 @@ class _Node {
     }
 }
 
-// Tester function to build a single deck with all questions in database
-router.post('/new', (req, res, next) => {
-
-    let deck = new LinkedList();
-
-    Question.find()
-    .then((result) => {
-        result.forEach((item) => {
-            deck.insertFirst(item)
-        })
-        return deck
-    })
-    .then((result) => {
-        let newDeck = {
-            name: 'French',
-            linkedList: deck
-        }
-        Deck.create(newDeck)
-        res.json('Deck Created')
-    })
-    .catch((err) => {
-        next(err)
-    })
-})
-
 //This endpoint builds a new deck by getting the deckIds of questions that match its own ID.
 router.put('/compile-deck/:id', (req, res, next) => {
     const { id } = req.params;
@@ -68,8 +43,6 @@ router.put('/compile-deck/:id', (req, res, next) => {
 router.delete('/delete-item', (req, res, next) => {
     const { deckId, questionId } = req.body;
 
-    console.log(questionId)
-
     let name;
     Question.findByIdAndRemove(questionId)
     .then((result) => {
@@ -81,7 +54,6 @@ router.delete('/delete-item', (req, res, next) => {
             let currNode = LL.head;
             let count = 0;
             let found = false
-
 
             if (currNode.value._id === questionId) {
                 found = true;
@@ -116,11 +88,6 @@ router.delete('/delete-item', (req, res, next) => {
             }
             Deck.findByIdAndUpdate(deckId, updateItem).then((result) => console.log(result))
             res.json(result)
-            // if (found === false) {
-            //     res.json(`Unable to find and delete item.`)            
-            // } else {
-            //     res.json(`Deleted ${questionId} from ${deckId}`)
-            // }
         })
         .catch((err) => next(err))
         })
@@ -238,10 +205,10 @@ router.post('/update-session/:id', (req, res, next) => {
 
     //Algorithm
     //1. Ensure that the LL is valid
-    //2a. Iterate through the LL, if the node to be reinserted is to be reinserted at the beginning, instead reinsert it 3 nodes away. <= Use a count variable
+    //2a. Iterate through the LL, if the node to be reinserted is to be reinserted at the beginning, insert it one after instead.
     //2b. Otherwise, insert the node before the first node where the memoryValue is higher.
-    //2c. If the while loop completes, it means the next value of current node is null, set that to be the reinserted value
-    //3. Set the new head of the LL to be the next value.
+    //2c. If the while loop gets to point where the next value is null, reinsert at that point.
+    //3. Set the new head of the LL to be the next value when doing the swaps.
     function handleSubmit(LL, reinsert, number) {
         if (!LL.head) {
             return null;
