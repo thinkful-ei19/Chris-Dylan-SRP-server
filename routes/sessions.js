@@ -221,7 +221,6 @@ router.put('/edit-item', (req, res, next) => {
 //Start sessions by getting the first question in a linkedList.
 router.get('/start-session/:id', (req, res, next) => {
     const { id } = req.params;
-    console.log(id)
 
     Deck.findById(id)
     .then((result) => {
@@ -239,10 +238,11 @@ router.post('/update-session/:id', (req, res, next) => {
     const { correct } = req.body;
 
     //Algorithm
-    //1. Ensure that the LL is valid, initiate variables for current node, previous node, count and loop status
-    //  (count is to prevent consistent front-loading of the same question, and loop status is used to determine what to do with a value to be put at the end)
-    //2. Iterate through the LL, if the node to be reinserted is to be reinserted at the beginning, instead reinsert it 3 nodes away.
-    //3. Otherwise, insert the node before the first node where the memoryValue is higher.
+    //1. Ensure that the LL is valid
+    //2a. Iterate through the LL, if the node to be reinserted is to be reinserted at the beginning, instead reinsert it 3 nodes away. <= Use a count variable
+    //2b. Otherwise, insert the node before the first node where the memoryValue is higher.
+    //2c. If the while loop completes, it means the next value of current node is null, set that to be the reinserted value
+    //3. Set the new head of the LL to be the next value.
     function handleSubmit(LL, reinsert, number) {
         let insert = reinsert;
         if (!LL.head) {
@@ -251,39 +251,49 @@ router.post('/update-session/:id', (req, res, next) => {
 
         let currNode = LL.head;
         let previousNode = LL.head;
-        let loopComplete = false;
+        // let loopComplete = false;
         let count = 0;
-        while (currNode.next !== null) {
-            count ++
+        while (currNode.next !== null) {            
+            count ++            
+            console.log(currNode.next)
             if (currNode.value.memoryValue >= number+1) {
+                //Memory value of currNode is higher/equal to than memory value of answered question.
                 if (count === 1) {
                     //If the card is going to be relegated back to the start, just push it back a few spots instead.
-                    previousNode = currNode.next;
-                    currNode = currNode.next.next;
+                    previousNode = currNode.next.next;
+                    currNode = currNode.next.next.next;
+                    //Swap
                     let placeholder = reinsert;
                     LL.head = LL.head.next;                   
                     placeholder.next = currNode;
                     previousNode.next = placeholder;
                 } else {
+                    //Insert node at current point in LL                    
+                    previousNode = currNode; //count -1
+                    currNode = currNode.next; //count -0
+                    //Swap
                     let placeholder = reinsert;
                     LL.head = LL.head.next;                   
                     placeholder.next = currNode;
                     previousNode.next = placeholder;
                 }
                 break           
-            } else if (currNode.next === null) {    
-                loopComplete = true;
+            } else if (currNode.next.next === null) {   
+                //Reached the end of the loop 
+                // loopComplete = true;
+                previousNode = currNode; //count -1
+                currNode = currNode.next; //count -0
+                //Swap
+                let placeholder = reinsert;
+                LL.head = LL.head.next;
+                placeholder.next = null;
+                currNode.next = placeholder
+                return LL;  
                 break
+            } else {
+                previousNode = currNode; //count -1
+                currNode = currNode.next; //count -0
             }
-            previousNode = currNode; //count -1
-            currNode = currNode.next; //count -0
-        }
-        if (loopComplete === true) {
-            let placeholder = reinsert;
-            LL.head = LL.head.next;
-            placeholder.next = null;
-            currNode.next = placeholder
-            return LL;                
         }
         return LL;
     }
