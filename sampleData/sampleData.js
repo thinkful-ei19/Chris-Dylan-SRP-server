@@ -9,14 +9,14 @@ const sample = [
     {
         memoryValue: 1,
         question: "Oui",
-        answer: "Yes / No",
+        answer: "Yes/No",
         __v: 0,
         __id: "5b0cbdd3922aee78146eb90a"
     },
     {
         memoryValue: 1,
         question: "Au revoir",
-        answer: "Good-bye",
+        answer: "Good bye",
         __v: 0,
         __id: "5b0cbdd3922aee78156bb90a"
     },
@@ -51,21 +51,21 @@ const sample = [
     {
         memoryValue: 1,
         question: "Je voudrais",
-        answer: "I would like (use with 'Please')",
+        answer: "I would like",
         __v: 0,
         __id: "5b0cbdd3922a2278146eb90a"
     },
     {
         memoryValue: 1,
         question: "Combien ça coûte?",
-        answer: "How much does it/this cost?",
+        answer: "How much does it cost?",
         __v: 0,
         __id: "5b0cb333922aee78146eb90a"
     },
     {
         memoryValue: 1,
         question: "Où sont les toilettes?",
-        answer: "Where are the restrooms? (use with 'Please')",
+        answer: "Where are the restrooms?",
         __v: 0,
         __id: "5b0cbdd392279e78146eb90a"
     }
