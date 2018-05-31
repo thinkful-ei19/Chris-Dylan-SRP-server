@@ -111,38 +111,6 @@ router.put('/users/:id', (req, res, next) => {
         })
 })
 
-// router.put('/password/:id', (req, res, next) => {
-//     const { id } = req.params;
-//     const { username, password, data, goal } = req.body;
-//     const options = { new: true }
-
-//     return User.hashPassword(password)
-//     .then(digest => {
-//         const newUser = {
-//             data: data,
-//             goal: "Maintain",
-//             username: username,
-//             password: digest
-//         }
-//         User.findByIdAndUpdate(id, newUser, options)
-//             .populate('data')
-//             //Deep populate measurements
-//             .populate({
-//                 path: 'data',
-//                 populate: { path: 'measurements'}
-//             })
-//             .then((result) => {
-//                 if (result) {
-//                     console.log(result);
-//                     res.json(result);
-//                 }
-//             })
-//             .catch((error) => {
-//                 next(error);
-//             })
-//     })
-// });
-
 router.delete('/users/:id', (req, res, next) => {
     const { id } = req.params;
 
