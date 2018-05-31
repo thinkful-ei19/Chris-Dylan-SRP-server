@@ -220,6 +220,7 @@ router.post('/update-session/:id', (req, res, next) => {
                 return LL
             }
         } catch(err) {}
+
         let currNode = LL.head;
         let previousNode = LL.head; 
         while (currNode.next !== null) {
