@@ -316,7 +316,8 @@ router.get('/deck-list/:id', (req, res, next) => {
                 if (result !== null) {
                     deck = {
                         name: result.name,
-                        id: result.id
+                        id: result.id,
+                        public: result.public
                     }
                     decks.push(deck)
                 }
@@ -357,5 +358,7 @@ router.post('/add-deck', (req, res, next) => {
         next(err)
     })
 })
+
+
 
 module.exports = router;

@@ -39,11 +39,12 @@ router.post('/decks', (req, res, next) => {
 })
 
 router.put('/decks/:id', (req, res, next) => {
-    const { name, linkedList } = req.body;
+    let public = false;    
+    const { name } = req.body;
     const { id } = req.params;
-    const updateItem = { name, linkedList, id };
 
-    //Working, but response is for some reason showing the old value rather than the new.
+    const updateItem = { name };    
+
     Deck.findByIdAndUpdate(id, updateItem)
         .then((result) => {
             res.json(result);
@@ -84,5 +85,49 @@ router.delete('/decks/:id', (req, res, next) => {
         })
 })
 
+router.put('/publish-deck/:id', (req, res, next) => {
+    const { public } = req.body;
+    const { id } = req.params;
+
+    const updateItem = { public };    
+
+    Deck.findByIdAndUpdate(id, updateItem)
+        .then((result) => {
+            res.json(result);
+        })
+        .catch((error) => {
+            next(error);
+        })
+})
+
+router.post('/copy-deck/:id', (req, res, next) => {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    Deck.findById(id)
+        .then((result) => {
+            const copiedDeck = {
+                linkedList: result.linkedList,
+                name: result.name
+            }
+            Deck.create(copiedDeck)
+            .then((result) => {
+                const deckId = result.id;
+                User.findById(userId)
+                .then((result) => {
+                    let updateItem = result;
+                    updateItem.decks.push(deckId)
+                    User.findByIdAndUpdate(userId, updateItem)
+                    .then((result) => {
+                        res.json(`Deck created for ${updateItem.username} with deckId of ${deckId}`)
+                    }).catch(err => next(err))
+                })
+                .catch(err => next(err))
+            })
+        })
+        .catch((error) => {
+            next(error);
+        })
+})
 
 module.exports = router;

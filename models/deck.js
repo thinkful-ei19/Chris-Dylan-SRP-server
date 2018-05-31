@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 
 const deckSchema = new mongoose.Schema({
   name: { type: String },
-  linkedList: { type: Object, default: null }
+  linkedList: { type: Object, default: null },
+  public: { type: Boolean, default: false }
 });
 
 deckSchema.set('toObject', {
