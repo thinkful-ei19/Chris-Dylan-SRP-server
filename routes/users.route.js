@@ -48,7 +48,7 @@ router.post('/users', (req, res, next) => {
     const { username, password } = req.body;
 
     const newDeck = {
-        name: 'French',
+        name: 'Basic French (Sample)',
         linkedList: demoLL
     }
 
