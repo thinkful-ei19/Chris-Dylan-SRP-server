@@ -35,6 +35,11 @@ app.use(
   })
 );
 
+app.get('/api', (req, res, next) => {
+  res.json('Heroku Server Started')
+})
+
+
 app.use(express.static('public'));
 
 app.use(express.json())
